@@ -44,19 +44,21 @@ class Architecture:
         return sq.Sequences(x_tr=x_tr, y_tr=y_tr, x_te=x_te, y_te=y_te)
 
     # noinspection PyUnresolvedReferences
-    def __model(self, x_tr: np.ndarray, y_tr: np.ndarray, units: int, batch_size: int) -> tf.keras.models.Sequential:
+    def __model(self, x_tr: np.ndarray, y_tr: np.ndarray, filters: int, batch_size: int) -> tf.keras.models.Sequential:
         """
 
         :param x_tr:
         :param y_tr:
-        :param units:
+        :param filters:
         :param batch_size:
         :return:
         """
 
+        units = filters
+
         architecture = tf.keras.models.Sequential()
-        architecture.add(tf.keras.layers.Input(shape=(x_tr.shape[1], x_tr.shape[2])))
-        architecture.add(tf.keras.layers.LSTM(units=units, return_sequences=False))
+        architecture.add( tf.keras.layers.Conv1D(filters=filters, kernel_size=(x_tr.shape[1],), activation='relu') )
+        architecture.add(tf.keras.layers.Dense(units=units, activation='relu'))
         architecture.add(tf.keras.layers.Dense(units=1))
 
         # error w.r.t. training data
@@ -91,7 +93,7 @@ class Architecture:
         j = -1
         model = None
         hyperparameters = {}
-        for units in self.__arguments.get('modelling').get('units'):
+        for filters in self.__arguments.get('modelling').get('filters'):
 
             for batch_size in self.__arguments.get('modelling').get('batch_size'):
 
@@ -99,18 +101,18 @@ class Architecture:
 
                 # noinspection PyUnresolvedReferences
                 cell: tf.keras.models.Sequential = self.__model(
-                    x_tr=sequences.x_tr, y_tr=sequences.y_tr, units=units, batch_size=batch_size)
+                    x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=filters, batch_size=batch_size)
                 latest = min(cell.history.history['loss'])
 
                 if j == 0:
                     model = cell
-                    hyperparameters = {'units': units, 'batch_size': batch_size}
+                    hyperparameters = {'filters': filters, 'batch_size': batch_size}
                     continue
 
                 previous = min(model.history.history['loss'])
                 if latest < previous:
                     model = cell
-                    hyperparameters = {'units': units, 'batch_size': batch_size}
+                    hyperparameters = {'filters': filters, 'batch_size': batch_size}
 
         # Hence
         src.modelling.artefacts.Artefacts(

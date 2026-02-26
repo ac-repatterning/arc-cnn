@@ -83,7 +83,7 @@ class Valuations:
 
         # The expected inverse transform structure
         structure = design.copy()[self.__disjoint][-n_points:]
-        structure.loc[:, self.__targets] = predictions
+        structure.loc[:, self.__targets] = predictions.squeeze()
         structure = structure.copy()[self.__features]
 
         # Reconfiguring
