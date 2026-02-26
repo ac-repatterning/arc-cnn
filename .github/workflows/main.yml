@@ -1,4 +1,4 @@
-name: 'hydrography: convolution neural networks'
+name: 'hydrography: forecasting & convolutional neural networks'
 
 on: [push]
 
