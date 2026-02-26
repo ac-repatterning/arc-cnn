@@ -54,7 +54,7 @@ class Partitions:
 
         # Focusing on ...
         excerpt = self.__arguments.get('catchments').get('excerpt')
-        if excerpt is None:
+        if not excerpt:
             gauges =  self.__gauges
         else:
             codes = np.unique(np.array(excerpt))
