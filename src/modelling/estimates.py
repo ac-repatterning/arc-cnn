@@ -51,7 +51,8 @@ class Estimates:
         :return:
         """
 
-        valuations = src.modelling.valuations.Valuations(model=model, scaler=intermediary.scaler, arguments=self.__arguments)
+        valuations = src.modelling.valuations.Valuations(
+            model=model, scaler=intermediary.scaler, arguments=self.__arguments)
 
         # training
         training = valuations.exc(x_matrix=sequences.x_tr, design=intermediary.training, original=master.training)
