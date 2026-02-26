@@ -1,4 +1,4 @@
-name: 'Hydrography: Recurrent Neural Network ↠ Long Short-Term Memory Deep Learning Architecture'
+name: 'Hydrography: CNN'
 
 on: [push]
 
