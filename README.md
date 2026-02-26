@@ -13,7 +13,7 @@ develop<br>
 
 **Note** &Rarr;
 * Function: Develops river level forecasting models, per gauge area, via river level gauge measures across Scotland.
-* Architecture: Convolution Neural Networks
+* Architecture: Convolutional Neural Network
 
 <br>
 <br>
