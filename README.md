@@ -1,5 +1,14 @@
 <br>
+
+master<br>
+[![Hydrography: CNN](https://github.com/ac-repatterning/arc-cnn/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/ac-repatterning/arc-cnn/actions/workflows/main.yml)
+
 <br>
+
+develop<br>
+[![Hydrography: CNN](https://github.com/ac-repatterning/arc-cnn/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/ac-repatterning/arc-cnn/actions/workflows/main.yml)
+
+
 <br>
 
 **Note** &Rarr;
