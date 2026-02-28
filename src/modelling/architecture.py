@@ -45,13 +45,15 @@ class Architecture:
         return sq.Sequences(x_tr=x_tr, y_tr=y_tr, x_te=x_te, y_te=y_te)
 
     # noinspection PyUnresolvedReferences
-    def __model(self, x_tr: np.ndarray, y_tr: np.ndarray, filters: int, batch_size: int) -> tf.keras.models.Sequential:
+    def __model(self, x_tr: np.ndarray, y_tr: np.ndarray, filters: int, batch_size: int,
+                activation: str = None) -> tf.keras.models.Sequential:
         """
 
         :param x_tr:
         :param y_tr:
         :param filters:
         :param batch_size:
+        :param activation:
         :return:
         """
 
@@ -59,8 +61,8 @@ class Architecture:
 
         architecture = tf.keras.models.Sequential()
         architecture.add( tf.keras.layers.Conv1D(
-            filters=filters, kernel_size=(x_tr.shape[1],), activation=self.__arg_modelling.get('activation')) )
-        architecture.add(tf.keras.layers.Dense(units=units, activation=self.__arg_modelling.get('activation')))
+            filters=filters, kernel_size=(x_tr.shape[1],), activation=activation) )
+        architecture.add(tf.keras.layers.Dense(units=units, activation=activation))
         architecture.add(tf.keras.layers.Dense(units=1))
 
         # error w.r.t. training data
@@ -99,28 +101,32 @@ class Architecture:
 
             for batch_size in self.__arg_modelling.get('batch_size'):
 
-                j = j + 1
+                for activation in self.__arg_modelling.get('activation'):
 
-                # noinspection PyUnresolvedReferences
-                cell: tf.keras.models.Sequential = self.__model(
-                    x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=filters, batch_size=batch_size)
-                latest = min(cell.history.history['loss'])
+                    j = j + 1
 
-                if j == 0:
-                    model = cell
-                    hyperparameters = {'filters': filters, 'batch_size': batch_size}
-                    continue
+                    cell: tf.keras.models.Sequential = self.__model(
+                        x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=filters,
+                        batch_size=batch_size, activation=activation)
+                    latest = min(cell.history.history['loss'])
+                    l_history = cell.history.history.shape[0]
 
-                previous = min(model.history.history['loss'])
-                if latest < previous:
-                    model = cell
-                    hyperparameters = {'filters': filters, 'batch_size': batch_size}
+                    if j == 0:
+                        model = cell
+                        hyperparameters = {'filters': filters, 'batch_size': batch_size,
+                                           'activation': activation, 'l_history': l_history}
+                        continue
+
+                    previous = min(model.history.history['loss'])
+                    if latest < previous:
+                        model = cell
+                        hyperparameters = {'filters': filters, 'batch_size': batch_size,
+                                           'activation': activation, 'l_history': l_history}
 
         # Hence
         src.modelling.artefacts.Artefacts(
             model=model, scaler=intermediary.scaler, arguments=self.__arguments, path=master.path).exc(
             hyperparameters=hyperparameters)
-        self.__estimates.exc(
-            model=model, sequences=sequences, intermediary=intermediary, master=master)
+        self.__estimates.exc(model=model, sequences=sequences, intermediary=intermediary, master=master)
 
         return '/'.join(master.path.rsplit(sep='/', maxsplit=2)[-2:])
