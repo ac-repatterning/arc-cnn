@@ -48,8 +48,10 @@ class Artefacts:
             'fields': elements.get('fields'), 'targets': elements.get('targets'),
             'n_sequence': self.__arguments.get('n_sequence'),
             'epochs': self.__model.history.params.get('epochs'),
+            'l_history': hyperparameters.get('l_history'),
             'filters': hyperparameters.get('filters'),
             'batch_size': hyperparameters.get('batch_size'),
+            'activation': hyperparameters.get('activation'),
             'training_starts': {
                 'epoch_milliseconds': self.__starting.epoch_milliseconds,
                 'string': self.__starting.string
