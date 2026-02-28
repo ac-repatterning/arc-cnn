@@ -23,8 +23,9 @@ class Architecture:
         """
 
         self.__arguments = arguments
-        self.__patience = self.__arguments.get('modelling').get('patience')
-        self.__epochs = self.__arguments.get('modelling').get('epochs')
+        self.__arg_modelling: dict = self.__arguments.get('modelling')
+        self.__patience = self.__arg_modelling.get('patience')
+        self.__epochs = self.__arg_modelling.get('epochs')
 
         # Instances
         self.__estimates = src.modelling.estimates.Estimates(arguments=self.__arguments)
@@ -57,14 +58,15 @@ class Architecture:
         units = filters
 
         architecture = tf.keras.models.Sequential()
-        architecture.add( tf.keras.layers.Conv1D(filters=filters, kernel_size=(x_tr.shape[1],), activation='relu') )
-        architecture.add(tf.keras.layers.Dense(units=units, activation='relu'))
+        architecture.add( tf.keras.layers.Conv1D(
+            filters=filters, kernel_size=(x_tr.shape[1],), activation=self.__arg_modelling.get('activation')) )
+        architecture.add(tf.keras.layers.Dense(units=units, activation=self.__arg_modelling.get('activation')))
         architecture.add(tf.keras.layers.Dense(units=1))
 
         # error w.r.t. training data
         early_stopping = tf.keras.callbacks.EarlyStopping(
-            monitor=self.__arguments.get('modelling').get('monitor'), patience=self.__patience, mode='min',
-            min_delta=self.__arguments.get('modelling').get('min_delta'))
+            monitor=self.__arg_modelling.get('monitor'), patience=self.__patience, mode='min',
+            min_delta=self.__arg_modelling.get('min_delta'))
 
         architecture.compile(
             loss=tf.keras.losses.MeanSquaredError(), optimizer=tf.keras.optimizers.Adam(),
@@ -93,9 +95,9 @@ class Architecture:
         j = -1
         model = None
         hyperparameters = {}
-        for filters in self.__arguments.get('modelling').get('filters'):
+        for filters in self.__arg_modelling.get('filters'):
 
-            for batch_size in self.__arguments.get('modelling').get('batch_size'):
+            for batch_size in self.__arg_modelling.get('batch_size'):
 
                 j = j + 1
 
