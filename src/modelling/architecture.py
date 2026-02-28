@@ -93,35 +93,37 @@ class Architecture:
         # get sequential structure
         sequences = self.__get_sequences(intermediary=intermediary)
 
+        # settings
+        settings: list[dict] = [{'batch_size': b, 'filters': f, 'activation': a}
+                                for b in self.__arg_modelling.get('batch_size')
+                                for f in self.__arg_modelling.get('filters')
+                                for a in self.__arg_modelling.get('activation')]
+
         # Modelling
         j = -1
         model = None
         hyperparameters = {}
-        for filters in self.__arg_modelling.get('filters'):
+        for setting in settings:
 
-            for batch_size in self.__arg_modelling.get('batch_size'):
+            j = j + 1
 
-                for activation in self.__arg_modelling.get('activation'):
+            cell: tf.keras.models.Sequential = self.__model(
+                x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=setting.get('filters'),
+                batch_size=setting.get('batch_size'), activation=setting.get('activation'))
+            latest = min(cell.history.history['loss'])
+            l_history = cell.history.history.shape[0]
 
-                    j = j + 1
+            if j == 0:
+                model = cell
+                hyperparameters = {'filters': setting.get('filters'), 'batch_size': setting.get('batch_size'),
+                                   'activation': setting.get('activation'), 'l_history': l_history}
+                continue
 
-                    cell: tf.keras.models.Sequential = self.__model(
-                        x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=filters,
-                        batch_size=batch_size, activation=activation)
-                    latest = min(cell.history.history['loss'])
-                    l_history = cell.history.history.shape[0]
-
-                    if j == 0:
-                        model = cell
-                        hyperparameters = {'filters': filters, 'batch_size': batch_size,
-                                           'activation': activation, 'l_history': l_history}
-                        continue
-
-                    previous = min(model.history.history['loss'])
-                    if latest < previous:
-                        model = cell
-                        hyperparameters = {'filters': filters, 'batch_size': batch_size,
-                                           'activation': activation, 'l_history': l_history}
+            previous = min(model.history.history['loss'])
+            if latest < previous:
+                model = cell
+                hyperparameters = {'filters': setting.get('filters'), 'batch_size': setting.get('batch_size'),
+                                   'activation': setting.get('activation'), 'l_history': l_history}
 
         # Hence
         src.modelling.artefacts.Artefacts(
