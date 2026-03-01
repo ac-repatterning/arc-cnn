@@ -111,7 +111,7 @@ class Architecture:
                 x_tr=sequences.x_tr, y_tr=sequences.y_tr, filters=setting.get('filters'),
                 batch_size=setting.get('batch_size'), activation=setting.get('activation'))
             latest = min(cell.history.history['loss'])
-            l_history = cell.history.history.shape[0]
+            l_history = len(cell.history.history['loss'])
 
             if j == 0:
                 model = cell
