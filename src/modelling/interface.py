@@ -1,5 +1,6 @@
 """Module interface.py"""
 import logging
+import multiprocessing
 
 import dask
 import pandas as pd
@@ -27,6 +28,8 @@ class Interface:
 
         self.__listings = listings
         self.__arguments = arguments
+
+        self.__n_cores = multiprocessing.cpu_count()
 
     @dask.delayed
     def __get_listing(self, ts_id: int) -> list[str]:
@@ -60,6 +63,6 @@ class Interface:
             master: mr.Master = __get_splits(data=data, partition=partition)
             message = __architecture(master=master)
             computations.append(message)
-        messages = dask.compute(computations)[0]
+        messages = dask.compute(computations, scheduler='processes', num_workers=int(0.75*self.__n_cores))[0]
 
         logging.info(messages)
