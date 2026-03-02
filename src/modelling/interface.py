@@ -29,6 +29,7 @@ class Interface:
         self.__listings = listings
         self.__arguments = arguments
 
+        # The number of central processing unit cores
         self.__n_cores = multiprocessing.cpu_count()
 
     @dask.delayed
