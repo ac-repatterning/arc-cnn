@@ -67,6 +67,10 @@ class Split:
         :return:
         """
 
+        if data.empty:
+            return mr.Master(training=pd.DataFrame(), testing=pd.DataFrame(),
+                             path=f'{partition.catchment_id}/{partition.ts_id}')
+
         frame = data.copy()
         frame.sort_values(by='timestamp', ascending=True, inplace=True)
 
