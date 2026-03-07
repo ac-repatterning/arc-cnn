@@ -1,4 +1,5 @@
 """Module architecture.py"""
+
 import numpy as np
 import tensorflow as tf
 
@@ -7,8 +8,8 @@ import src.elements.master as mr
 import src.elements.sequences as sq
 import src.modelling.artefacts
 import src.modelling.estimates
-import src.modelling.sequencing
 import src.modelling.scaling
+import src.modelling.sequencing
 
 
 class Architecture:
@@ -86,6 +87,9 @@ class Architecture:
         :param master:
         :return:
         """
+
+        if master.training.empty:
+            return f'{master.path}: No model.  Insufficient data instances.'
 
         # scaling
         intermediary: itr.Intermediary = self.__scaling.exc(master=master)
