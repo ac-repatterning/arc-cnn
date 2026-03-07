@@ -1,4 +1,5 @@
 """Module architecture.py"""
+
 import numpy as np
 import tensorflow as tf
 
@@ -7,8 +8,8 @@ import src.elements.master as mr
 import src.elements.sequences as sq
 import src.modelling.artefacts
 import src.modelling.estimates
-import src.modelling.sequencing
 import src.modelling.scaling
+import src.modelling.sequencing
 
 
 class Architecture:
@@ -87,10 +88,11 @@ class Architecture:
         :return:
         """
 
-        # scaling
-        intermediary: itr.Intermediary = self.__scaling.exc(master=master)
+        if master.training.empty:
+            return f'{master.path}: No model.  Insufficient data instances.'
 
-        # get sequential structure
+        # scaling, sequences
+        intermediary: itr.Intermediary = self.__scaling.exc(master=master)
         sequences = self.__get_sequences(intermediary=intermediary)
 
         # settings
@@ -104,7 +106,6 @@ class Architecture:
         model = None
         hyperparameters = {}
         for setting in settings:
-
             j = j + 1
 
             cell: tf.keras.models.Sequential = self.__model(
@@ -119,8 +120,7 @@ class Architecture:
                                    'activation': setting.get('activation'), 'l_history': l_history}
                 continue
 
-            previous = min(model.history.history['loss'])
-            if latest < previous:
+            if latest < min(model.history.history['loss']):
                 model = cell
                 hyperparameters = {'filters': setting.get('filters'), 'batch_size': setting.get('batch_size'),
                                    'activation': setting.get('activation'), 'l_history': l_history}

@@ -3,7 +3,6 @@ import sys
 
 import pandas as pd
 
-import src.assets.foci
 import src.assets.gauges
 import src.assets.partitions
 import src.elements.partitions as pr

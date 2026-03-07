@@ -17,13 +17,32 @@ class Data:
         :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
         """
 
+        self.__arguments = arguments
+
         # Focus
         self.__dtype = {'timestamp': np.float64, 'ts_id': np.float64, 'measure': float}
 
         # seconds, milliseconds
-        as_from: datetime.datetime = (datetime.datetime.now()
-                                      - datetime.timedelta(days=round(arguments.get('spanning')*365)))
+        self.__stamp = datetime.datetime.now()
+        as_from: datetime.datetime = (self.__stamp - datetime.timedelta(days=round(self.__arguments.get('spanning')*365)))
         self.__as_from = as_from.timestamp() * 1000
+
+    def __limit(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        # of instances (24 hours) * (n days) / frequency
+
+        :param data:
+        :return:
+        """
+
+        days = int(self.__arguments.get('at_least')*365)
+        frequency = float(self.__arguments.get('frequency').removesuffix('h'))
+        n_instances = int(24*days/frequency)
+
+        if data.shape[0] < n_instances:
+            return pd.DataFrame()
+
+        return data
 
     def __get_data(self, listing: list[str]):
         """
@@ -73,5 +92,6 @@ class Data:
 
         # Filter
         data = data.copy().loc[data['timestamp'] >= self.__as_from, :]
+        data = self.__limit(data=data.copy())
 
         return data

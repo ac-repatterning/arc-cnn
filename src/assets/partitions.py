@@ -62,7 +62,7 @@ class Partitions:
             gauges = gauges if gauges.shape[0] > 0 else self.__gauges
 
         # Hence, the gauges in focus vis-à-vis the years in focus
-        listings = limits.merge(gauges, how='left', on='date')
+        listings = limits.merge(gauges, how='inner', on='date')
 
         # ...
         partitions = listings[['catchment_id', 'ts_id']].drop_duplicates()
