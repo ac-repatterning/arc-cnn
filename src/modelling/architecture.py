@@ -91,10 +91,8 @@ class Architecture:
         if master.training.empty:
             return f'{master.path}: No model.  Insufficient data instances.'
 
-        # scaling
+        # scaling, sequences
         intermediary: itr.Intermediary = self.__scaling.exc(master=master)
-
-        # get sequential structure
         sequences = self.__get_sequences(intermediary=intermediary)
 
         # settings
@@ -108,7 +106,6 @@ class Architecture:
         model = None
         hyperparameters = {}
         for setting in settings:
-
             j = j + 1
 
             cell: tf.keras.models.Sequential = self.__model(
@@ -123,8 +120,7 @@ class Architecture:
                                    'activation': setting.get('activation'), 'l_history': l_history}
                 continue
 
-            previous = min(model.history.history['loss'])
-            if latest < previous:
+            if latest < min(model.history.history['loss']):
                 model = cell
                 hyperparameters = {'filters': setting.get('filters'), 'batch_size': setting.get('batch_size'),
                                    'activation': setting.get('activation'), 'l_history': l_history}
